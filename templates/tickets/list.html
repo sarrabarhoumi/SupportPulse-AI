@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %} – Tickets{% endblock %}
+{% block page_title %}Liste des tickets{% endblock %}
+{% block content %}
+<div class="table-card p-4 mb-4">
+    <form class="row g-3" method="get">
+        <div class="col-md-4"><input class="form-control" name="search" value="{{ filters.search }}" placeholder="Référence, sujet, contenu, email"></div>
+        <div class="col-md-2">
+            <select class="form-select" name="category">
+                <option value="">Toutes catégories</option>
+                {% for category in categories %}<option value="{{ category['name'] }}" {% if filters.category == category['name'] %}selected{% endif %}>{{ category['name'] }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2"><select class="form-select" name="priority"><option value="">Toutes priorités</option><option value="faible">faible</option><option value="moyenne">moyenne</option><option value="haute">haute</option><option value="critique">critique</option></select></div>
+        <div class="col-md-2"><select class="form-select" name="status"><option value="">Tous statuts</option><option value="new">new</option><option value="analyzed">analyzed</option><option value="reviewed">reviewed</option><option value="closed">closed</option></select></div>
+        <div class="col-md-2 d-grid"><button class="btn btn-primary">Filtrer</button></div>
+    </form>
+</div>
+<div class="table-card p-4">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead><tr><th>Référence</th><th>Sujet</th><th>Canal</th><th>Catégorie</th><th>Priorité</th><th>Urgence</th><th>Confiance</th><th></th></tr></thead>
+            <tbody>
+            {% for item in tickets %}
+                <tr>
+                    <td>{{ item['reference_code'] }}</td>
+                    <td>{{ item['subject'] }}</td>
+                    <td>{{ item['channel'] }}</td>
+                    <td>{{ item['predicted_category'] or '-' }}</td>
+                    <td><span class="badge badge-priority-{{ item['predicted_priority'] or 'faible' }}">{{ item['predicted_priority'] or '-' }}</span></td>
+                    <td><span class="badge badge-urgency-{{ item['predicted_urgency'] or 'basse' }}">{{ item['predicted_urgency'] or '-' }}</span></td>
+                    <td>{{ '%.2f'|format(item['confidence_score'] or 0) }}</td>
+                    <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('ticket_detail', ticket_id=item['id']) }}">Détail</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="8" class="text-center text-muted py-4">Aucun ticket trouvé.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %} – Import en lot{% endblock %}
+{% block page_title %}Import en lot{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="table-card p-4">
+            <form method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="mb-3"><label class="form-label">Fichier CSV ou JSON</label><input class="form-control" type="file" name="import_file" accept=".csv,.json" required></div>
+                <button class="btn btn-primary">Importer et analyser</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="table-card p-4">
+            <h2 class="h5 fw-bold mb-3">Format attendu</h2>
+            <pre class="code-box">subject,customer_name,customer_email,channel,content
+Erreur de connexion,Jean,jean@client.fr,email,Impossible de me connecter...</pre>
+            {% if result %}
+            <hr>
+            <div><strong>Importés :</strong> {{ result.imported_count }}</div>
+            <div><strong>Échecs :</strong> {{ result.failed_count }}</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

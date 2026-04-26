@@ -1,0 +1,557 @@
+{% extends 'base.html' %}
+{% block title %} – Dashboard{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<style>
+:root{
+    --dash-bg:#f6f8fc;
+    --dash-card:#ffffff;
+    --dash-text:#0f172a;
+    --dash-muted:#64748b;
+    --dash-border:#e7ecf3;
+    --dash-primary:#1d4ed8;
+    --dash-indigo:#4f46e5;
+    --dash-cyan:#0891b2;
+    --dash-amber:#d97706;
+    --dash-red:#dc2626;
+    --dash-shadow:0 16px 40px rgba(15,23,42,.06);
+}
+
+.dashboard-wrap{
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+}
+
+.dashboard-hero{
+    position:relative;
+    overflow:hidden;
+    border-radius:26px;
+    padding:28px;
+    background:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,.16), transparent 24%),
+        radial-gradient(circle at 85% 15%, rgba(147,197,253,.22), transparent 22%),
+        linear-gradient(135deg, #0f172a 0%, #111827 35%, #1e3a8a 100%);
+    color:#fff;
+    box-shadow:var(--dash-shadow);
+}
+
+.dashboard-hero::before{
+    content:"";
+    position:absolute;
+    right:-60px;
+    top:-40px;
+    width:200px;
+    height:200px;
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+}
+
+.hero-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.07);
+    border-radius:999px;
+    font-size:.78rem;
+    font-weight:700;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    margin-bottom:14px;
+}
+
+.hero-title{
+    margin:0 0 8px;
+    font-size:1.9rem;
+    font-weight:800;
+    letter-spacing:-.03em;
+}
+
+.hero-subtitle{
+    margin:0;
+    max-width:760px;
+    color:rgba(255,255,255,.82);
+    line-height:1.65;
+}
+
+.hero-mini-stats{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:14px;
+    margin-top:24px;
+}
+
+.hero-mini-card{
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.06);
+    backdrop-filter:blur(8px);
+    border-radius:18px;
+    padding:14px 16px;
+}
+
+.hero-mini-label{
+    font-size:.8rem;
+    color:rgba(255,255,255,.72);
+    margin-bottom:5px;
+}
+
+.hero-mini-value{
+    font-size:1.1rem;
+    font-weight:800;
+}
+
+.kpi-card{
+    background:var(--dash-card);
+    border:1px solid var(--dash-border);
+    border-radius:22px;
+    padding:20px;
+    box-shadow:var(--dash-shadow);
+    height:100%;
+    position:relative;
+    overflow:hidden;
+}
+
+.kpi-card::after{
+    content:"";
+    position:absolute;
+    inset:auto -24px -24px auto;
+    width:90px;
+    height:90px;
+    border-radius:999px;
+    background:linear-gradient(135deg, rgba(37,99,235,.08), rgba(79,70,229,.04));
+}
+
+.kpi-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+}
+
+.kpi-tag{
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:.78rem;
+    font-weight:700;
+    border:1px solid #e8edf4;
+    background:#fafcff;
+    color:#475569;
+}
+
+.kpi-icon{
+    width:44px;
+    height:44px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:.9rem;
+    font-weight:800;
+}
+
+.kpi-icon.blue{ background:#dbeafe; color:#1d4ed8; }
+.kpi-icon.indigo{ background:#e0e7ff; color:#4338ca; }
+.kpi-icon.amber{ background:#ffedd5; color:#d97706; }
+.kpi-icon.red{ background:#fee2e2; color:#dc2626; }
+
+.kpi-label{
+    color:var(--dash-muted);
+    font-size:.84rem;
+    font-weight:600;
+    margin-bottom:8px;
+}
+
+.kpi-value{
+    color:var(--dash-text);
+    font-size:2rem;
+    line-height:1;
+    font-weight:800;
+    letter-spacing:-.04em;
+    margin-bottom:8px;
+}
+
+.kpi-help{
+    color:var(--dash-muted);
+    font-size:.82rem;
+}
+
+.section-card{
+    background:var(--dash-card);
+    border:1px solid var(--dash-border);
+    border-radius:22px;
+    box-shadow:var(--dash-shadow);
+    overflow:hidden;
+    height:100%;
+}
+
+.section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    padding:20px 22px 14px;
+    border-bottom:1px solid #eef2f7;
+}
+
+.section-title{
+    margin:0 0 4px;
+    font-size:1.02rem;
+    font-weight:800;
+    color:var(--dash-text);
+}
+
+.section-subtitle{
+    margin:0;
+    color:var(--dash-muted);
+    font-size:.88rem;
+}
+
+.section-pill{
+    padding:7px 11px;
+    border-radius:999px;
+    background:#f8fafc;
+    border:1px solid #e7edf5;
+    color:#475569;
+    font-size:.78rem;
+    font-weight:700;
+}
+
+.section-body{
+    padding:18px 22px 22px;
+}
+
+.activity-card{
+    background:var(--dash-card);
+    border:1px solid var(--dash-border);
+    border-radius:22px;
+    box-shadow:var(--dash-shadow);
+    overflow:hidden;
+}
+
+.activity-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:20px 22px 14px;
+    border-bottom:1px solid #eef2f7;
+}
+
+.activity-title{
+    margin:0;
+    font-size:1.02rem;
+    font-weight:800;
+    color:var(--dash-text);
+}
+
+.activity-subtitle{
+    color:var(--dash-muted);
+    font-size:.88rem;
+    margin-top:4px;
+}
+
+.btn-soft-dark{
+    border-radius:12px;
+    font-weight:700;
+    padding:9px 14px;
+}
+
+.activity-table thead th{
+    background:#fbfcfe;
+    color:#64748b;
+    font-size:.77rem;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    font-weight:800;
+    padding:14px 16px;
+    border-bottom:1px solid #edf2f7;
+}
+
+.activity-table tbody td{
+    padding:15px 16px;
+    border-bottom:1px solid #f1f5f9;
+    vertical-align:middle;
+}
+
+.activity-table tbody tr:hover{
+    background:#fafcff;
+}
+
+.ref-link{
+    color:#0f172a;
+    text-decoration:none;
+    font-weight:800;
+}
+
+.ref-link:hover{
+    color:var(--dash-primary);
+}
+
+.subject-text{
+    color:#334155;
+    font-weight:500;
+    max-width:320px;
+}
+
+@media (max-width: 991.98px){
+    .section-head,
+    .activity-head{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+    .hero-mini-stats{
+        grid-template-columns:1fr;
+    }
+}
+
+@media (max-width: 767.98px){
+    .dashboard-hero{
+        padding:22px;
+        border-radius:22px;
+    }
+    .hero-title{
+        font-size:1.55rem;
+    }
+    .kpi-value{
+        font-size:1.7rem;
+    }
+}
+</style>
+
+<div class="dashboard-wrap">
+
+    <!-- <div class="dashboard-hero">
+        <div class="hero-badge">SupportPulse AI · Dashboard</div>
+        <h2 class="hero-title">Vue globale du support et des priorités</h2>
+        <p class="hero-subtitle">
+            Une lecture claire des volumes, des urgences et de l’activité récente pour piloter le traitement des tickets avec rapidité.
+        </p>
+
+        <div class="hero-mini-stats">
+            <div class="hero-mini-card">
+                <div class="hero-mini-label">Tickets analysés</div>
+                <div class="hero-mini-value">{{ metrics.total_tickets }}</div>
+            </div>
+            <div class="hero-mini-card">
+                <div class="hero-mini-label">Urgences actives</div>
+                <div class="hero-mini-value">{{ metrics.urgent_tickets }}</div>
+            </div>
+            <div class="hero-mini-card">
+                <div class="hero-mini-label">Temps moyen</div>
+                <div class="hero-mini-value">{{ metrics.average_processing_time }} ms</div>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="row g-3">
+        <div class="col-md-6 col-xl-3">
+            <div class="kpi-card">
+                <div class="kpi-top">
+                    <div class="kpi-icon blue">TK</div>
+                    <span class="kpi-tag">Volume</span>
+                </div>
+                <div class="kpi-label">Tickets analysés</div>
+                <div class="kpi-value">{{ metrics.total_tickets }}</div>
+                <div class="kpi-help">Vision consolidée du flux support</div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="kpi-card">
+                <div class="kpi-top">
+                    <div class="kpi-icon indigo">UR</div>
+                    <span class="kpi-tag">Urgence</span>
+                </div>
+                <div class="kpi-label">Tickets urgents</div>
+                <div class="kpi-value">{{ metrics.urgent_tickets }}</div>
+                <div class="kpi-help">Dossiers à surveiller de près</div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="kpi-card">
+                <div class="kpi-top">
+                    <div class="kpi-icon red">CR</div>
+                    <span class="kpi-tag">Critique</span>
+                </div>
+                <div class="kpi-label">Tickets critiques</div>
+                <div class="kpi-value">{{ metrics.critical_tickets }}</div>
+                <div class="kpi-help">Cas bloquants ou sensibles</div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="kpi-card">
+                <div class="kpi-top">
+                    <div class="kpi-icon amber">AI</div>
+                    <span class="kpi-tag">Performance</span>
+                </div>
+                <div class="kpi-label">Temps moyen d’analyse</div>
+                <div class="kpi-value">{{ metrics.average_processing_time }}</div>
+                <div class="kpi-help">Mesuré en millisecondes</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="section-card">
+                <div class="section-head">
+                    <div>
+                        <h2 class="section-title">Répartition par catégorie</h2>
+                        <p class="section-subtitle">Vue métier des types de demandes</p>
+                    </div>
+                    <span class="section-pill">Analyse métier</span>
+                </div>
+                <div class="section-body">
+                    <canvas id="categoryChart" height="220"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="section-card">
+                <div class="section-head">
+                    <div>
+                        <h2 class="section-title">Répartition par priorité</h2>
+                        <p class="section-subtitle">Lecture opérationnelle de l’impact</p>
+                    </div>
+                    <span class="section-pill">Priorisation</span>
+                </div>
+                <div class="section-body">
+                    <canvas id="priorityChart" height="220"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="activity-card">
+        <div class="activity-head">
+            <div>
+                <h2 class="activity-title">Activité récente</h2>
+                <div class="activity-subtitle">Derniers tickets analysés et mis à jour</div>
+            </div>
+            <a class="btn btn-outline-dark btn-sm btn-soft-dark" href="{{ url_for('tickets_list') }}">Voir tous les tickets</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table activity-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Référence</th>
+                        <th>Sujet</th>
+                        <th>Catégorie</th>
+                        <th>Priorité</th>
+                        <th>Statut</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for item in metrics.recent_activity %}
+                    <tr>
+                        <td>
+                            <a class="ref-link" href="{{ url_for('ticket_detail', ticket_id=item['id']) }}">
+                                {{ item['reference_code'] }}
+                            </a>
+                        </td>
+                        <td class="subject-text">{{ item['subject'] }}</td>
+                        <td>{{ item['predicted_category'] or '-' }}</td>
+                        <td>
+                            <span class="badge badge-priority-{{ item['predicted_priority'] or 'faible' }}">
+                                {{ item['predicted_priority'] or '-' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge badge-status-{{ item['status'] }}">
+                                {{ item['status'] }}
+                            </span>
+                        </td>
+                        <td>{{ item['updated_at']|datetime_fr }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+new Chart(document.getElementById('categoryChart'), {
+  type: 'doughnut',
+  data: {
+    labels: [{% for item in metrics.by_category %}'{{ item['label'] }}',{% endfor %}],
+    datasets: [{
+      data: [{% for item in metrics.by_category %}{{ item['total'] }},{% endfor %}],
+      backgroundColor: ['#1d4ed8','#4f46e5','#0891b2','#0f766e','#d97706','#dc2626','#64748b'],
+      borderWidth: 0,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    cutout: '70%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          pointStyle: 'circle',
+          padding: 18,
+          color: '#475569',
+          font: { size: 12, weight: 700 }
+        }
+      },
+      tooltip: {
+        backgroundColor: '#0f172a',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        padding: 12,
+        cornerRadius: 12
+      }
+    }
+  }
+});
+
+new Chart(document.getElementById('priorityChart'), {
+  type: 'bar',
+  data: {
+    labels: [{% for item in metrics.by_priority %}'{{ item['label'] }}',{% endfor %}],
+    datasets: [{
+      data: [{% for item in metrics.by_priority %}{{ item['total'] }},{% endfor %}],
+      backgroundColor: ['#cbd5e1','#93c5fd','#fdba74','#f87171'],
+      borderRadius: 14,
+      borderSkipped: false,
+      maxBarThickness: 44
+    }]
+  },
+  options: {
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#0f172a',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        padding: 12,
+        cornerRadius: 12
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { color: '#64748b', font: { weight: 700 } }
+      },
+      y: {
+        beginAtZero: true,
+        grid: { color: '#eef2f7' },
+        ticks: { color: '#64748b', precision: 0 }
+      }
+    }
+  }
+});
+</script>
+{% endblock %}

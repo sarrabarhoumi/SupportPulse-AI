@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% block title %} – Ajouter un ticket{% endblock %}
+{% block page_title %}Ajouter un ticket{% endblock %}
+
+{% block content %}
+<div class="ticket-page">
+    <div class="ticket-shell">
+
+        <div class="ticket-main">
+            <div class="ticket-head">
+                <span class="ticket-kicker">SupportPulse AI</span>
+                <h2>Créer un ticket</h2>
+                <p>
+                    Ajoute un nouveau ticket puis lance une analyse intelligente
+                    pour estimer la catégorie, la priorité et l’urgence.
+                </p>
+            </div>
+
+            <form method="post" class="ticket-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                <div class="field-block">
+                    <label for="subject" class="field-label">Sujet</label>
+                    <input
+                        id="subject"
+                        class="form-control sp-input"
+                        name="subject"
+                        placeholder="Ex. Problème d’accès à l’espace client"
+                        required
+                    >
+                </div>
+
+                <div class="form-grid">
+                    <div class="field-block">
+                        <label for="customer_name" class="field-label">Nom client</label>
+                        <input
+                            id="customer_name"
+                            class="form-control sp-input"
+                            name="customer_name"
+                            placeholder="Nom du client"
+                        >
+                    </div>
+
+                    <div class="field-block">
+                        <label for="customer_email" class="field-label">Email client</label>
+                        <input
+                            id="customer_email"
+                            type="email"
+                            class="form-control sp-input"
+                            name="customer_email"
+                            placeholder="client@entreprise.com"
+                        >
+                    </div>
+                </div>
+
+                <div class="field-block">
+                    <label for="channel" class="field-label">Canal</label>
+                    <select id="channel" class="form-select sp-input" name="channel">
+                        <option value="email">Email</option>
+                        <option value="chat">Chat</option>
+                        <option value="web">Web</option>
+                        <option value="telephone">Téléphone</option>
+                    </select>
+                </div>
+
+                <div class="field-block">
+                    <label for="content" class="field-label">Contenu du ticket</label>
+                    <textarea
+                        id="content"
+                        class="form-control sp-input sp-textarea"
+                        name="content"
+                        rows="10"
+                        placeholder="Décris le problème, le contexte, l’impact et le niveau d’urgence..."
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="ticket-footer">
+                    <button type="button" id="preview-analysis-btn" class="btn sp-btn-light">
+                        Prévisualiser
+                    </button>
+                    <button class="btn sp-btn-dark">
+                        Enregistrer et analyser
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <aside class="ticket-side">
+            <div class="preview-card">
+                <div class="preview-head">
+                    <h3>Prévisualisation</h3>
+                    <p>Analyse rapide sans enregistrement.</p>
+                </div>
+
+                <div id="preview-analysis-result" class="preview-body">
+                    <div class="preview-placeholder">
+                        <div class="preview-dot"></div>
+                        <strong>Aucune analyse pour le moment</strong>
+                        <span>
+                            Clique sur “Prévisualiser” pour afficher une estimation
+                            de la catégorie, de la priorité et de l’urgence.
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+</div>
+
+<style>
+.ticket-page {
+    padding: 6px 0 0;
+}
+
+.ticket-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) 360px;
+    gap: 24px;
+    align-items: start;
+}
+
+.ticket-main,
+.preview-card {
+    background: #ffffff;
+    border: 1px solid #e8edf3;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+}
+
+.ticket-head {
+    padding: 28px 28px 20px;
+    border-bottom: 1px solid #eef2f6;
+}
+
+.ticket-kicker {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 10px;
+}
+
+.ticket-head h2 {
+    margin: 0 0 8px;
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.ticket-head p {
+    margin: 0;
+    max-width: 720px;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.ticket-form {
+    padding: 28px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.field-block {
+    margin-bottom: 20px;
+}
+
+.field-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #0f172a;
+    font-size: 0.95rem;
+}
+
+.sp-input {
+    min-height: 50px;
+    border-radius: 14px;
+    border: 1px solid #d9e2ec;
+    padding: 0.8rem 0.95rem;
+    color: #0f172a;
+    box-shadow: none;
+    background: #ffffff;
+}
+
+.sp-input::placeholder {
+    color: #94a3b8;
+}
+
+.sp-input:focus {
+    border-color: #c7d2fe;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.10);
+}
+
+.sp-textarea {
+    min-height: 220px;
+    resize: vertical;
+    padding-top: 0.95rem;
+}
+
+.ticket-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 8px;
+}
+
+.sp-btn-dark,
+.sp-btn-light {
+    height: 46px;
+    padding: 0 18px;
+    border-radius: 14px;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.sp-btn-dark {
+    background: #111827;
+    color: #ffffff;
+}
+
+.sp-btn-dark:hover {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.sp-btn-light {
+    background: #ffffff;
+    color: #0f172a;
+    border-color: #d9e2ec;
+}
+
+.sp-btn-light:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.ticket-side {
+    position: sticky;
+    top: 24px;
+}
+
+.preview-head {
+    padding: 22px 22px 16px;
+    border-bottom: 1px solid #eef2f6;
+}
+
+.preview-head h3 {
+    margin: 0 0 6px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.preview-head p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.92rem;
+}
+
+.preview-body {
+    padding: 22px;
+}
+
+.preview-placeholder {
+    min-height: 240px;
+    border: 1px dashed #d8e1eb;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #fcfdff 0%, #f8fafc 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 22px;
+    color: #64748b;
+}
+
+.preview-placeholder strong {
+    color: #0f172a;
+    font-size: 0.97rem;
+}
+
+.preview-placeholder span {
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+.preview-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #111827;
+    margin-bottom: 2px;
+}
+
+@media (max-width: 1100px) {
+    .ticket-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .ticket-side {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .ticket-head,
+    .ticket-form,
+    .preview-head,
+    .preview-body {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .ticket-footer {
+        flex-direction: column;
+    }
+
+    .sp-btn-dark,
+    .sp-btn-light {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

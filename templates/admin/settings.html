@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %} – Paramètres{% endblock %}
+{% block page_title %}Paramètres du moteur{% endblock %}
+{% block content %}
+<div class="table-card p-4">
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="row g-4">
+            {% for key, item in settings.items() %}
+            <div class="col-md-6">
+                <label class="form-label">{{ key }}</label>
+                <input class="form-control" name="{{ key }}" value="{{ item['value'] }}">
+                <div class="form-text">{{ item['description'] }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="mt-4"><button class="btn btn-primary">Enregistrer</button></div>
+    </form>
+</div>
+{% endblock %}

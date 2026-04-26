@@ -1,0 +1,30 @@
+[
+  {
+    "subject": "Plateforme indisponible pour notre équipe",
+    "customer_name": "Nadia Trabelsi",
+    "customer_email": "nadia@client-premium.fr",
+    "channel": "email",
+    "content": "Depuis 08h15, aucun membre de l'équipe ne peut accéder à la plateforme. C'est bloquant pour la production d'aujourd'hui."
+  },
+  {
+    "subject": "Question sur l'API de synchronisation",
+    "customer_name": "Thomas Robert",
+    "customer_email": "thomas@integrateur.fr",
+    "channel": "web",
+    "content": "Bonjour, pouvez-vous me confirmer le format attendu pour le webhook de synchronisation et le comportement en cas d'erreur ?"
+  },
+  {
+    "subject": "Je suis très déçu du support",
+    "customer_name": "Meriem Haddad",
+    "customer_email": "meriem@retail.fr",
+    "channel": "chat",
+    "content": "Je suis mécontente car j'ai relancé trois fois au sujet de mon problème de facturation sans réponse claire."
+  },
+  {
+    "subject": "Le filtre priorité ne fonctionne pas",
+    "customer_name": "Karim Ben Salem",
+    "customer_email": "karim@esn.fr",
+    "channel": "email",
+    "content": "Quand je filtre les tickets critiques, la liste affiche aussi des tickets faibles. Cela ressemble à un bug de l'interface."
+  }
+]

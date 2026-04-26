@@ -1,0 +1,560 @@
+{% extends 'base.html' %}
+{% block title %} – Statistiques{% endblock %}
+{% block page_title %}Statistiques globales{% endblock %}
+
+{% block content %}
+{% set total_imported = stats.imports|sum(attribute='imported_count') %}
+{% set total_failed = stats.imports|sum(attribute='failed_count') %}
+{% set total_imports = stats.imports|length %}
+{% set total_days = stats.tickets_by_day|length %}
+
+<style>
+:root{
+    --st-bg:#f6f8fc;
+    --st-card:#ffffff;
+    --st-text:#0f172a;
+    --st-muted:#64748b;
+    --st-border:#e7ecf3;
+    --st-blue:#2563eb;
+    --st-indigo:#4f46e5;
+    --st-cyan:#0891b2;
+    --st-emerald:#059669;
+    --st-red:#dc2626;
+    --st-amber:#d97706;
+    --st-shadow:0 16px 40px rgba(15,23,42,.06);
+}
+
+.stats-wrap{
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+}
+
+.stats-hero{
+    position:relative;
+    overflow:hidden;
+    border-radius:24px;
+    padding:28px;
+    background:
+        radial-gradient(circle at 12% 18%, rgba(255,255,255,.14), transparent 22%),
+        radial-gradient(circle at 88% 12%, rgba(96,165,250,.20), transparent 20%),
+        linear-gradient(135deg, #0f172a 0%, #172554 45%, #1e3a8a 100%);
+    color:#fff;
+    box-shadow:var(--st-shadow);
+}
+
+.stats-hero::after{
+    content:"";
+    position:absolute;
+    right:-50px;
+    bottom:-70px;
+    width:220px;
+    height:220px;
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+}
+
+.stats-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    font-size:.78rem;
+    font-weight:700;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    margin-bottom:14px;
+}
+
+.stats-title{
+    margin:0 0 8px;
+    font-size:1.85rem;
+    font-weight:800;
+    letter-spacing:-.03em;
+}
+
+.stats-subtitle{
+    margin:0;
+    max-width:760px;
+    color:rgba(255,255,255,.82);
+    line-height:1.65;
+}
+
+.stats-mini{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:14px;
+    margin-top:22px;
+}
+
+.stats-mini-card{
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.06);
+    backdrop-filter:blur(8px);
+    border-radius:18px;
+    padding:14px 16px;
+}
+
+.stats-mini-label{
+    font-size:.8rem;
+    color:rgba(255,255,255,.72);
+    margin-bottom:5px;
+}
+
+.stats-mini-value{
+    font-size:1.08rem;
+    font-weight:800;
+}
+
+.kpi-card{
+    background:var(--st-card);
+    border:1px solid var(--st-border);
+    border-radius:22px;
+    padding:20px;
+    box-shadow:var(--st-shadow);
+    height:100%;
+    position:relative;
+    overflow:hidden;
+}
+
+.kpi-card::after{
+    content:"";
+    position:absolute;
+    inset:auto -22px -22px auto;
+    width:90px;
+    height:90px;
+    border-radius:999px;
+    background:linear-gradient(135deg, rgba(37,99,235,.08), rgba(79,70,229,.04));
+}
+
+.kpi-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+}
+
+.kpi-icon{
+    width:44px;
+    height:44px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:.9rem;
+    font-weight:800;
+}
+
+.kpi-icon.blue{ background:#dbeafe; color:#1d4ed8; }
+.kpi-icon.indigo{ background:#e0e7ff; color:#4338ca; }
+.kpi-icon.green{ background:#d1fae5; color:#059669; }
+.kpi-icon.red{ background:#fee2e2; color:#dc2626; }
+
+.kpi-tag{
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:.78rem;
+    font-weight:700;
+    border:1px solid #e8edf4;
+    background:#fafcff;
+    color:#475569;
+}
+
+.kpi-label{
+    color:var(--st-muted);
+    font-size:.84rem;
+    font-weight:600;
+    margin-bottom:8px;
+}
+
+.kpi-value{
+    color:var(--st-text);
+    font-size:2rem;
+    line-height:1;
+    font-weight:800;
+    letter-spacing:-.04em;
+    margin-bottom:8px;
+}
+
+.kpi-help{
+    color:var(--st-muted);
+    font-size:.82rem;
+}
+
+.panel-card{
+    background:var(--st-card);
+    border:1px solid var(--st-border);
+    border-radius:22px;
+    box-shadow:var(--st-shadow);
+    overflow:hidden;
+    height:100%;
+}
+
+.panel-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    padding:20px 22px 14px;
+    border-bottom:1px solid #eef2f7;
+}
+
+.panel-title{
+    margin:0 0 4px;
+    font-size:1.02rem;
+    font-weight:800;
+    color:var(--st-text);
+}
+
+.panel-subtitle{
+    margin:0;
+    color:var(--st-muted);
+    font-size:.88rem;
+}
+
+.panel-pill{
+    padding:7px 11px;
+    border-radius:999px;
+    background:#f8fafc;
+    border:1px solid #e7edf5;
+    color:#475569;
+    font-size:.78rem;
+    font-weight:700;
+}
+
+.panel-body{
+    padding:18px 22px 22px;
+}
+
+.import-card{
+    background:var(--st-card);
+    border:1px solid var(--st-border);
+    border-radius:22px;
+    box-shadow:var(--st-shadow);
+    overflow:hidden;
+}
+
+.import-head{
+    padding:20px 22px 14px;
+    border-bottom:1px solid #eef2f7;
+}
+
+.import-title{
+    margin:0;
+    font-size:1.02rem;
+    font-weight:800;
+    color:var(--st-text);
+}
+
+.import-subtitle{
+    margin-top:4px;
+    color:var(--st-muted);
+    font-size:.88rem;
+}
+
+.import-table thead th{
+    background:#fbfcfe;
+    color:#64748b;
+    font-size:.77rem;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    font-weight:800;
+    padding:14px 16px;
+    border-bottom:1px solid #edf2f7;
+}
+
+.import-table tbody td{
+    padding:15px 16px;
+    border-bottom:1px solid #f1f5f9;
+    vertical-align:middle;
+}
+
+.import-table tbody tr:hover{
+    background:#fafcff;
+}
+
+.import-file{
+    color:#0f172a;
+    font-weight:700;
+}
+
+.import-type{
+    display:inline-flex;
+    align-items:center;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#f8fafc;
+    border:1px solid #e7edf5;
+    color:#475569;
+    font-size:.78rem;
+    font-weight:700;
+}
+
+.import-success{
+    font-weight:700;
+    color:#059669;
+}
+
+.import-failed{
+    font-weight:700;
+    color:#dc2626;
+}
+
+.empty-state{
+    padding:34px 20px;
+    text-align:center;
+    color:var(--st-muted);
+}
+
+@media (max-width: 991.98px){
+    .panel-head{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+    .stats-mini{
+        grid-template-columns:1fr;
+    }
+}
+
+@media (max-width: 767.98px){
+    .stats-hero{
+        padding:22px;
+    }
+    .stats-title{
+        font-size:1.55rem;
+    }
+    .kpi-value{
+        font-size:1.7rem;
+    }
+}
+</style>
+
+<div class="stats-wrap">
+
+ <!--    <div class="stats-hero">
+        <div class="stats-badge">SupportPulse AI · Analytics</div>
+        <h2 class="stats-title">Vue analytique du support</h2>
+        <p class="stats-subtitle">
+            Suivi des tendances d’activité, des canaux d’entrée et de la qualité des imports dans une interface claire et premium.
+        </p>
+
+        <div class="stats-mini">
+            <div class="stats-mini-card">
+                <div class="stats-mini-label">Périodes suivies</div>
+                <div class="stats-mini-value">{{ total_days }}</div>
+            </div>
+            <div class="stats-mini-card">
+                <div class="stats-mini-label">Imports enregistrés</div>
+                <div class="stats-mini-value">{{ total_imports }}</div>
+            </div>
+            <div class="stats-mini-card">
+                <div class="stats-mini-label">Tickets importés</div>
+                <div class="stats-mini-value">{{ total_imported }}</div>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="row g-3">
+        <div class="col-md-6 col-xl-3">
+            <div class="kpi-card">
+                <div class="kpi-top">
+                    <div class="kpi-icon blue">EV</div>
+                    <span class="kpi-tag">Tendance</span>
+                </div>
+                <div class="kpi-label">Jours analysés</div>
+                <div class="kpi-value">{{ total_days }}</div>
+                <div class="kpi-help">Fenêtre temporelle visible</div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="kpi-card">
+                <div class="kpi-top">
+                    <div class="kpi-icon indigo">IM</div>
+                    <span class="kpi-tag">Historique</span>
+                </div>
+                <div class="kpi-label">Nombre d’imports</div>
+                <div class="kpi-value">{{ total_imports }}</div>
+                <div class="kpi-help">Imports CSV / JSON exécutés</div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="kpi-card">
+                <div class="kpi-top">
+                    <div class="kpi-icon green">OK</div>
+                    <span class="kpi-tag">Succès</span>
+                </div>
+                <div class="kpi-label">Tickets importés</div>
+                <div class="kpi-value">{{ total_imported }}</div>
+                <div class="kpi-help">Enregistrements traités avec succès</div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="kpi-card">
+                <div class="kpi-top">
+                    <div class="kpi-icon red">ER</div>
+                    <span class="kpi-tag">Qualité</span>
+                </div>
+                <div class="kpi-label">Échecs d’import</div>
+                <div class="kpi-value">{{ total_failed }}</div>
+                <div class="kpi-help">Lignes rejetées ou invalides</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="panel-card">
+                <div class="panel-head">
+                    <div>
+                        <h2 class="panel-title">Évolution des tickets</h2>
+                        <p class="panel-subtitle">Lecture chronologique de l’activité support</p>
+                    </div>
+                    <span class="panel-pill">Timeline</span>
+                </div>
+                <div class="panel-body">
+                    <canvas id="dayChart" height="220"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="panel-card">
+                <div class="panel-head">
+                    <div>
+                        <h2 class="panel-title">Répartition par canal</h2>
+                        <p class="panel-subtitle">Origine des tickets analysés</p>
+                    </div>
+                    <span class="panel-pill">Canaux</span>
+                </div>
+                <div class="panel-body">
+                    <canvas id="channelChart" height="220"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="import-card">
+        <div class="import-head">
+            <h2 class="import-title">Historique des imports</h2>
+            <div class="import-subtitle">Suivi des fichiers traités et de la qualité d’importation</div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table import-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Fichier</th>
+                        <th>Type</th>
+                        <th>Importés</th>
+                        <th>Échecs</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in stats.imports %}
+                    <tr>
+                        <td class="import-file">{{ item['file_name'] }}</td>
+                        <td><span class="import-type">{{ item['import_type'] }}</span></td>
+                        <td class="import-success">{{ item['imported_count'] }}</td>
+                        <td class="import-failed">{{ item['failed_count'] }}</td>
+                        <td>{{ item['created_at']|datetime_fr }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="empty-state">Aucun import enregistré.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+new Chart(document.getElementById('dayChart'), {
+  type: 'line',
+  data: {
+    labels: [{% for item in stats.tickets_by_day %}'{{ item['day'] }}',{% endfor %}],
+    datasets: [{
+      data: [{% for item in stats.tickets_by_day %}{{ item['total'] }},{% endfor %}],
+      borderColor: '#2563eb',
+      backgroundColor: 'rgba(37, 99, 235, 0.10)',
+      fill: true,
+      tension: 0.35,
+      borderWidth: 3,
+      pointRadius: 4,
+      pointHoverRadius: 5,
+      pointBackgroundColor: '#2563eb',
+      pointBorderWidth: 0
+    }]
+  },
+  options: {
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#0f172a',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        padding: 12,
+        cornerRadius: 12
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { color: '#64748b', font: { weight: 700 } }
+      },
+      y: {
+        beginAtZero: true,
+        grid: { color: '#eef2f7' },
+        ticks: { color: '#64748b', precision: 0 }
+      }
+    }
+  }
+});
+
+new Chart(document.getElementById('channelChart'), {
+  type: 'doughnut',
+  data: {
+    labels: [{% for item in stats.channels %}'{{ item['label'] }}',{% endfor %}],
+    datasets: [{
+      data: [{% for item in stats.channels %}{{ item['total'] }},{% endfor %}],
+      backgroundColor: ['#2563eb','#4f46e5','#0891b2','#10b981','#f59e0b','#ef4444','#64748b'],
+      borderWidth: 0,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    cutout: '68%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          pointStyle: 'circle',
+          padding: 18,
+          color: '#475569',
+          font: { size: 12, weight: 700 }
+        }
+      },
+      tooltip: {
+        backgroundColor: '#0f172a',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        padding: 12,
+        cornerRadius: 12
+      }
+    }
+  }
+});
+</script>
+{% endblock %}

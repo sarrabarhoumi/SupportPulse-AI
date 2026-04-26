@@ -1,0 +1,5 @@
+subject,customer_name,customer_email,channel,content
+Erreur sur la création d'utilisateur,Claire Martin,claire@startup.fr,email,Quand j'essaie de créer un nouvel utilisateur, un message d'erreur apparaît et l'écran reste bloqué.
+Facture incorrecte pour avril,Yanis Belaid,yanis@cabinet.tn,email,La facture d'avril contient deux lignes d'abonnement au lieu d'une seule. Merci de vérifier.
+Connexion impossible après réinitialisation,Sonia Perez,sonia@grande-entreprise.com,chat,Je viens de réinitialiser mon mot de passe mais le portail refuse toujours ma connexion et indique compte invalide.
+Suggestion de tableau exportable,Paul Henry,paul@agence.fr,email,Serait-il possible d'ajouter un bouton d'export CSV ou Excel sur la liste des tickets ?

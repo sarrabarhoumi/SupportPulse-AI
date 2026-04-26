@@ -1,0 +1,483 @@
+{% extends 'base.html' %}
+{% block title %} – Détail ticket{% endblock %}
+{% block page_title %}Détail du ticket{% endblock %}
+
+{% block content %}
+{% set item = ticket.ticket %}
+{% set prediction = ticket.prediction %}
+
+<div class="ticket-detail-page">
+    <div class="row g-4">
+        <div class="col-xl-8 col-lg-7">
+
+            <!-- Bloc ticket -->
+            <div class="sp-card mb-4">
+                <div class="sp-card-body">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
+                        <div>
+                            <div class="sp-reference">{{ item['reference_code'] }}</div>
+                            <h2 class="sp-ticket-title mb-2">{{ item['subject'] }}</h2>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="sp-badge sp-badge-soft">{{ item['channel']|capitalize }}</span>
+                                {% if item['customer_name'] %}
+                                <span class="sp-badge sp-badge-soft">{{ item['customer_name'] }}</span>
+                                {% endif %}
+                                {% if item['customer_email'] %}
+                                <span class="sp-badge sp-badge-soft">{{ item['customer_email'] }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge badge-priority-{{ item['predicted_priority'] or 'faible' }}">
+                                {{ item['predicted_priority'] or 'Non défini' }}
+                            </span>
+                            <span class="badge badge-urgency-{{ item['predicted_urgency'] or 'basse' }}">
+                                {{ item['predicted_urgency'] or 'Non défini' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="sp-meta-label">Client</div>
+                            <div class="sp-meta-value">{{ item['customer_name'] or '-' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="sp-meta-label">Email</div>
+                            <div class="sp-meta-value">{{ item['customer_email'] or '-' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="sp-meta-label">Canal</div>
+                            <div class="sp-meta-value">{{ item['channel'] }}</div>
+                        </div>
+                    </div>
+
+                    <div class="sp-section-label mb-2">Contenu du ticket</div>
+                    <div class="sp-content-box">
+                        {{ item['content'] }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bloc analyse -->
+            <div class="sp-card mb-4">
+                <div class="sp-card-header">
+                    <div>
+                        <h3 class="sp-card-title mb-1">Résultat de l’analyse</h3>
+                        <p class="sp-card-subtitle mb-0">
+                            Synthèse automatique du ticket et estimation des niveaux de traitement.
+                        </p>
+                    </div>
+
+                    <form method="post" action="{{ url_for('ticket_reanalyze', ticket_id=item['id']) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button class="btn btn-outline-dark btn-sm sp-btn-minimal">
+                            Relancer l’analyse
+                        </button>
+                    </form>
+                </div>
+
+                <div class="sp-card-body">
+
+                    <!-- KPI analyse -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3 col-6">
+                            <div class="sp-stat-card">
+                                <div class="sp-stat-label">Catégorie</div>
+                                <div class="sp-stat-value">{{ item['predicted_category'] or '-' }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="sp-stat-card">
+                                <div class="sp-stat-label">Sentiment</div>
+                                <div class="sp-stat-value">{{ item['predicted_sentiment'] or '-' }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="sp-stat-card">
+                                <div class="sp-stat-label">Confiance</div>
+                                <div class="sp-stat-value">{{ '%.2f'|format(item['confidence_score'] or 0) }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="sp-stat-card">
+                                <div class="sp-stat-label">Équipe</div>
+                                <div class="sp-stat-value">{{ item['suggested_team'] or '-' }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Barre de confiance -->
+                    {% set confidence_percent = ((item['confidence_score'] or 0) * 100)|round(0, 'floor') %}
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="sp-section-label mb-0">Niveau de confiance</div>
+                            <div class="sp-confidence-text">{{ confidence_percent }}%</div>
+                        </div>
+                        <div class="sp-progress">
+                            <div class="sp-progress-bar" style="width: {{ confidence_percent }}%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="sp-info-block">
+                                <div class="sp-section-label">Résumé automatique</div>
+                                <div class="sp-info-text">
+                                    {{ item['summary'] or 'Aucun résumé disponible.' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="sp-info-block">
+                                <div class="sp-section-label">Explication du scoring</div>
+                                <div class="sp-info-text">
+                                    {{ item['explanation'] or 'Aucune explication disponible.' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if prediction %}
+                        <div class="col-12">
+                            <div class="sp-info-block">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                                    <div class="sp-section-label mb-0">Mode transparence</div>
+                                    <span class="sp-mini-note">Indices détectés par le moteur</span>
+                                </div>
+
+                                {% set reasons = prediction['reasons_json']|safe|replace('[','')|replace(']','')|replace('"','') %}
+                                <div class="sp-tags">
+                                    {% for reason in reasons.split(',') if reason.strip() %}
+                                    <span class="sp-tag">{{ reason.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5">
+
+            <!-- Correction -->
+            <div class="sp-card mb-4">
+                <div class="sp-card-header simple">
+                    <div>
+                        <h3 class="sp-card-title mb-1">Corriger le scoring</h3>
+                        <p class="sp-card-subtitle mb-0">Ajuste manuellement la prédiction si nécessaire.</p>
+                    </div>
+                </div>
+
+                <div class="sp-card-body">
+                    <form method="post" action="{{ url_for('ticket_correct', ticket_id=item['id']) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                        <div class="mb-3">
+                            <label class="form-label sp-label">Nouvelle catégorie</label>
+                            <select class="form-select sp-input" name="new_category">
+                                {% for category in categories %}
+                                <option value="{{ category['name'] }}">{{ category['name'] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label sp-label">Nouvelle priorité</label>
+                            <select class="form-select sp-input" name="new_priority">
+                                <option>faible</option>
+                                <option>moyenne</option>
+                                <option>haute</option>
+                                <option>critique</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label sp-label">Nouvelle urgence</label>
+                            <select class="form-select sp-input" name="new_urgency">
+                                <option>basse</option>
+                                <option>normale</option>
+                                <option>elevee</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label sp-label">Commentaire</label>
+                            <textarea class="form-control sp-input" name="comment" rows="4" placeholder="Explique la correction..."></textarea>
+                        </div>
+
+                        <button class="btn btn-dark w-100 sp-submit-btn">Enregistrer la correction</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Historique -->
+            <div class="sp-card">
+                <div class="sp-card-header simple">
+                    <div>
+                        <h3 class="sp-card-title mb-1">Historique des corrections</h3>
+                        <p class="sp-card-subtitle mb-0">Traçabilité des modifications manuelles.</p>
+                    </div>
+                </div>
+
+                <div class="sp-card-body">
+                    {% for correction in ticket.corrections %}
+                    <div class="sp-history-item">
+                        <div class="sp-history-date">
+                            {{ correction['corrected_at']|datetime_fr }} – {{ correction['corrected_by_name'] or 'Utilisateur' }}
+                        </div>
+                        <div class="sp-history-change">
+                            <strong>{{ correction['previous_category'] }}</strong>
+                            <span class="mx-1">→</span>
+                            <strong>{{ correction['new_category'] }}</strong>
+                        </div>
+                        <div class="sp-history-comment">
+                            {{ correction['comment'] or 'Sans commentaire' }}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-muted">Aucune correction enregistrée.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+.ticket-detail-page {
+    padding-top: 4px;
+}
+
+.sp-card {
+    background: #ffffff;
+    border: 1px solid #e9edf3;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+}
+
+.sp-card-header {
+    padding: 22px 24px;
+    border-bottom: 1px solid #eef2f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.sp-card-header.simple {
+    display: block;
+}
+
+.sp-card-body {
+    padding: 24px;
+}
+
+.sp-card-title {
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.sp-card-subtitle {
+    color: #64748b;
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
+.sp-reference {
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-bottom: 6px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.sp-ticket-title {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+}
+
+.sp-meta-label,
+.sp-section-label {
+    font-size: 0.83rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.sp-meta-value {
+    margin-top: 6px;
+    color: #111827;
+    font-weight: 500;
+}
+
+.sp-content-box,
+.sp-info-block {
+    border: 1px solid #edf1f5;
+    background: #fafbfd;
+    border-radius: 14px;
+    padding: 18px;
+}
+
+.sp-content-box {
+    line-height: 1.7;
+    color: #334155;
+    white-space: pre-line;
+}
+
+.sp-info-text {
+    margin-top: 10px;
+    color: #334155;
+    line-height: 1.7;
+}
+
+.sp-stat-card {
+    border: 1px solid #edf1f5;
+    border-radius: 14px;
+    padding: 16px;
+    background: #ffffff;
+    height: 100%;
+}
+
+.sp-stat-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.sp-stat-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.35;
+}
+
+.sp-progress {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: #eef2f7;
+    overflow: hidden;
+}
+
+.sp-progress-bar {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #111827 0%, #334155 100%);
+}
+
+.sp-confidence-text {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.sp-mini-note {
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.sp-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.sp-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: #f8fafc;
+    border: 1px solid #e5eaf0;
+    font-size: 0.88rem;
+    color: #334155;
+    font-weight: 500;
+}
+
+.sp-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 11px;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    font-weight: 600;
+}
+
+.sp-badge-soft {
+    background: #f8fafc;
+    border: 1px solid #e6ebf1;
+    color: #475569;
+}
+
+.sp-label {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.sp-input {
+    min-height: 46px;
+    border-radius: 12px;
+    border-color: #dbe3ec;
+    box-shadow: none;
+}
+
+.sp-input:focus {
+    border-color: #c7d2fe;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.10);
+}
+
+.sp-submit-btn,
+.sp-btn-minimal {
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.sp-history-item {
+    border: 1px solid #edf1f5;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: #ffffff;
+}
+
+.sp-history-item:last-child {
+    margin-bottom: 0;
+}
+
+.sp-history-date {
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.sp-history-change {
+    color: #0f172a;
+    margin-bottom: 6px;
+}
+
+.sp-history-comment {
+    font-size: 0.92rem;
+    color: #475569;
+}
+
+@media (max-width: 991.98px) {
+    .sp-card-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+</style>
+{% endblock %}

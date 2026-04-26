@@ -1,0 +1,18 @@
+[
+  {"subject": "Erreur 500 sur la page de paiement", "content": "Depuis ce matin, la validation du paiement affiche une erreur 500 et aucun achat ne passe.", "category": "bug", "priority": "haute"},
+  {"subject": "Application indisponible en production", "content": "Notre équipe ne peut plus accéder à la plateforme, le service semble complètement indisponible.", "category": "incident", "priority": "critique"},
+  {"subject": "Question sur la dernière facture", "content": "Pouvez-vous m'expliquer la ligne supplémentaire sur la facture de mars ?", "category": "facturation", "priority": "moyenne"},
+  {"subject": "Impossible de réinitialiser mon mot de passe", "content": "Le lien de réinitialisation m'affiche un message invalide et je ne peux plus me connecter.", "category": "acces", "priority": "haute"},
+  {"subject": "Comment configurer le webhook ?", "content": "Je cherche la procédure pour configurer un webhook sortant avec votre API.", "category": "technique", "priority": "moyenne"},
+  {"subject": "Demande d'information sur les rôles", "content": "Pouvez-vous préciser la différence entre administrateur, analyste et lecteur ?", "category": "demande_information", "priority": "faible"},
+  {"subject": "Très déçu par le délai de réponse", "content": "Je suis mécontent, personne ne répond à mes messages depuis trois jours.", "category": "reclamation", "priority": "haute"},
+  {"subject": "Suggestion d'export Excel", "content": "Ce serait utile d'ajouter un export Excel sur la liste des tickets.", "category": "suggestion", "priority": "faible"},
+  {"subject": "Le SDK Python ne gère pas notre proxy", "content": "Lors de l'intégration technique, les requêtes du SDK échouent derrière notre proxy d'entreprise.", "category": "technique", "priority": "moyenne"},
+  {"subject": "Double prélèvement sur mon abonnement", "content": "Nous avons été facturés deux fois ce mois-ci, merci de vérifier rapidement.", "category": "facturation", "priority": "haute"},
+  {"subject": "Panne intermittente sur l'espace admin", "content": "L'interface admin renvoie parfois une page blanche quand nous modifions un utilisateur.", "category": "incident", "priority": "haute"},
+  {"subject": "Bug de filtre sur les tickets", "content": "Le filtre par priorité ne renvoie pas les bons résultats dans le tableau.", "category": "bug", "priority": "moyenne"},
+  {"subject": "Peut-on ajouter un thème sombre ?", "content": "Nous aimerions un mode sombre pour le confort visuel de l'équipe support.", "category": "suggestion", "priority": "faible"},
+  {"subject": "Compte verrouillé après plusieurs essais", "content": "Notre gestionnaire de compte est bloqué hors de l'application après plusieurs tentatives de connexion.", "category": "acces", "priority": "haute"},
+  {"subject": "Besoin d'aide pour comprendre les tags", "content": "Je n'ai pas compris comment utiliser les tags et les filtres avancés.", "category": "demande_information", "priority": "faible"},
+  {"subject": "Escalade client premium", "content": "Client premium très mécontent suite à plusieurs anomalies non résolues.", "category": "reclamation", "priority": "haute"}
+]
